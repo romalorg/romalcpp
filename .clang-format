@@ -1,0 +1,16 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+ColumnLimit: 100
+# Use features of C++11, C++14 and C++1z (e.g. A<A<int>> instead of A<A<int> >).
+Standard: Cpp11
+AlignEscapedNewlinesLeft: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+# Force clang to use the pointer alignment style instead of guessing it from file context.
+DerivePointerAlignment: false
+---
+Language: Proto
+BasedOnStyle: Google
+ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: Empty
+...

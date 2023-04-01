@@ -1,0 +1,52 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "romalcpp",
+    hdrs = [
+        "msg_converter_traits.h",
+        "node.h",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "romalcpp_ros2",
+    srcs = ["ros2_node_impl.cpp"],
+    hdrs = ["ros2_node_impl.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":romalcpp",
+        "@ros2_rclcpp//:rclcpp",
+    ],
+)
+
+# ROS STUFF
+load("@com_github_mvukov_rules_ros2//ros2:bag.bzl", "ros2_bag")
+load("@com_github_mvukov_rules_ros2//ros2:cc_defs.bzl", "ros2_cpp_binary")
+
+ros2_cpp_binary(
+    name = "talker",
+    srcs = ["talker.cpp"],
+    deps = [
+        "@ros2_common_interfaces//:cpp_std_msgs",
+        "@ros2_rclcpp//:rclcpp",
+    ],
+)
+
+ros2_cpp_binary(
+    name = "listener",
+    srcs = ["listener.cpp"],
+    deps = [
+        "@ros2_common_interfaces//:cpp_std_msgs",
+        "@ros2_rclcpp//:rclcpp",
+    ],
+)
+
+ros2_bag(
+    name = "rosbag",
+    idl_deps = [
+        "@ros2_common_interfaces//:std_msgs",
+        "@ros2_rcl_interfaces//:rcl_interfaces",
+        "@ros2_rosbag2//:rosbag2_interfaces",
+    ],
+)

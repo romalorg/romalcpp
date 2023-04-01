@@ -1,0 +1,61 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+#################################################################################
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+#################################################################################
+# Latest commit as of: March 25, 2023
+http_archive(
+    name = "hedron_compile_commands",
+    sha256 = "c65e4ed2ca24ed488ec02a9b8cb7b36e5322317bdbdb93706d71ed6ce48b1b56",
+    strip_prefix = "bazel-compile-commands-extractor-bbd6a143199d91d1ec7777545ef6dc115785cdfb",
+    urls = [
+        "https://github.com/hedronvision/bazel-compile-commands-extractor/archive/bbd6a143199d91d1ec7777545ef6dc115785cdfb.tar.gz",
+    ],
+)
+
+load("@hedron_compile_commands//:workspace_setup.bzl", "hedron_compile_commands_setup")
+
+hedron_compile_commands_setup()
+
+#################################################################################
+# rules_ros2 - Build ROS 2 with Bazel
+#################################################################################
+http_archive(
+    name = "com_github_mvukov_rules_ros2",
+    sha256 = "c9476afee64001b7a30ddac676d2e6a48a4aecb42d0b849c9a8cf1ec21dcd318",
+    strip_prefix = "rules_ros2-609c3de5a94272bb10cc0c18dd96de77b0ac7222",
+    urls = ["https://github.com/mvukov/rules_ros2/archive/609c3de5a94272bb10cc0c18dd96de77b0ac7222.tar.gz"],
+)
+
+load("@com_github_mvukov_rules_ros2//repositories:repositories.bzl", "ros2_repositories")
+
+ros2_repositories()
+
+load("@com_github_mvukov_rules_ros2//repositories:deps.bzl", "PIP_ANNOTATIONS", "ros2_deps")
+
+ros2_deps()
+
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+
+python_register_toolchains(
+    name = "rules_ros2_python",
+    python_version = "3.8.13",
+)
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+load("@rules_ros2_python//:defs.bzl", python_interpreter_target = "interpreter")
+
+pip_parse(
+    name = "rules_ros2_pip_deps",
+    annotations = PIP_ANNOTATIONS,
+    python_interpreter_target = python_interpreter_target,
+    requirements_lock = "@com_github_mvukov_rules_ros2//:requirements_lock.txt",
+)
+
+load(
+    "@rules_ros2_pip_deps//:requirements.bzl",
+    install_rules_ros2_pip_deps = "install_deps",
+)
+
+install_rules_ros2_pip_deps()
