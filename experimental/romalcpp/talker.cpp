@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
+#include "romalcpp_examples_ros2_msgs/msg/hello_world.hpp"
 #include "std_msgs/msg/string.hpp"
 
 /* This example creates a subclass of Node and uses a fancy C++11 lambda
@@ -28,11 +29,11 @@ class MinimalPublisher : public rclcpp::Node {
     declare_parameter("callback_period_ms", 500);
     auto callback_period_ms = get_parameter("callback_period_ms").as_int();
 
-    publisher_ = create_publisher<std_msgs::msg::String>("topic", 10);
+    publisher_ = create_publisher<romalcpp_examples_ros2_msgs::msg::HelloWorld>("topic", 10);
     auto timer_callback = [this]() -> void {
-      auto message = std_msgs::msg::String();
-      message.data = "Hello, world! " + std::to_string(count_++);
-      RCLCPP_INFO(get_logger(), "Publishing: '%s'", message.data.c_str());
+      auto message = romalcpp_examples_ros2_msgs::msg::HelloWorld();
+      message.message = "Hello, world! " + std::to_string(count_++);
+      RCLCPP_INFO(get_logger(), "Publishing: '%s'", message.message.c_str());
       publisher_->publish(message);
     };
     timer_ = create_wall_timer(std::chrono::milliseconds(callback_period_ms), timer_callback);
@@ -40,7 +41,7 @@ class MinimalPublisher : public rclcpp::Node {
 
  private:
   rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+  rclcpp::Publisher<romalcpp_examples_ros2_msgs::msg::HelloWorld>::SharedPtr publisher_;
   size_t count_;
 };
 

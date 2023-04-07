@@ -1,16 +1,21 @@
-load("@com_github_mvukov_rules_ros2//ros2:cc_defs.bzl", "ros2_cpp_binary")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-ros2_cpp_binary(
-    name = "listener",
-    srcs = [
-        "listener.cpp",
-        "ros2_msg_converters.cpp",
-        "ros2_msg_converters.h",
-    ],
+cc_library(
+    name = "listener_node",
+    hdrs = ["listener_node.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//romalcpp",
-        "//romalcpp:romalcpp_ros2",
-        "@ros2_common_interfaces//:cpp_std_msgs",
-        "@ros2_rclcpp//:rclcpp",
+        "//romalcpp/examples/ros2:msgs_cpp",
+    ],
+)
+
+cc_library(
+    name = "talker_node",
+    hdrs = ["talker_node.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//romalcpp",
+        "//romalcpp/examples/ros2:msgs_cpp",
     ],
 )

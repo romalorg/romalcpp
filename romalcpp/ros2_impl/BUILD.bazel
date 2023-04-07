@@ -1,0 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "ros2_impl",
+    srcs = ["ros2_node_impl.cpp"],
+    hdrs = [
+        "ros2_node_impl.h",
+        "ros2_publisher_impl.h",
+        "ros2_subscriber_impl.h",
+        "ros2_timer_impl.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//romalcpp",
+        "@ros2_rclcpp//:rclcpp",
+    ],
+)

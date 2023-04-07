@@ -1,54 +1,47 @@
 #pragma once
 
-#include <any>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <typeindex>
-#include <unordered_map>
-#include <utility>
+
+#include "romalcpp/publisher.h"
+#include "romalcpp/subscriber.h"
+#include "romalcpp/timer.h"
 
 namespace romalcpp {
-
-template <class ObjT>
-class Publisher {
- public:
-  void publish(const ObjT& obj);
-};
-
-template <class ObjT>
-class Subscriber {
- public:
-  using CallbackFn = std::function<void(ObjT&)>;
-};
 
 template <class NodeImpl>
 class Node {
  public:
-  explicit Node(std::string name) : name_{std::move(name)} {}
+  explicit Node(std::string name, std::shared_ptr<NodeImpl> node_impl)
+      : name_{std::move(name)}, node_impl_{std::move(node_impl)} {}
 
   Node(const Node&) = delete;
-  Node(Node&&) = delete;
+  Node(Node&&) noexcept = default;
   Node& operator=(const Node&) = delete;
-  Node& operator=(Node&&) = delete;
+  Node& operator=(Node&&) noexcept = default;
   virtual ~Node() = default;
 
   std::string name() { return name_; }
+  void run() { node_impl_->run(); }
 
-  virtual void init() {}
-  virtual void run() { throw std::runtime_error{"Unimplemented"}; }
-
-  template <class ObjT>
-  std::shared_ptr<Publisher<ObjT>> createPublisher(const std::string& topic) {
-    return static_cast<NodeImpl&>(*this).template createPublisherImpl<ObjT>(topic);
+  template <class MsgT>
+  std::shared_ptr<Publisher<MsgT>> createPublisher(const std::string& topic, int queue_size) {
+    return node_impl_->template createPublisher<MsgT>(topic, queue_size);
   }
 
-  template <class ObjT>
-  std::shared_ptr<Subscriber<ObjT>> createSubscriber(
-      const std::string& topic, int queue_size, typename Subscriber<ObjT>::CallbackFn callback) {
-    return static_cast<NodeImpl&>(*this).template createSubscriberImpl<ObjT>(topic, queue_size,
-                                                                             callback);
+  template <class MsgT>
+  std::shared_ptr<Subscriber<MsgT>> createSubscriber(
+      const std::string& topic, int queue_size, typename Subscriber<MsgT>::CallbackFn callback) {
+    return node_impl_->template createSubscriber<MsgT>(topic, queue_size, callback);
+  }
+
+  template <typename DurationRepT, typename DurationT>
+  std::shared_ptr<Timer> createTimer(std::chrono::duration<DurationRepT, DurationT> period,
+                                     Timer::CallbackFn callback) {
+    return node_impl_->template createTimer(period, callback);
   }
 
  private:
