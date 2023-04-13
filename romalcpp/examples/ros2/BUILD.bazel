@@ -1,3 +1,5 @@
+load("@com_github_mvukov_rules_ros2//ros2:bag.bzl", "ros2_bag")
+load("@com_github_mvukov_rules_ros2//ros2:topic.bzl", "ros2_topic")
 load("@com_github_mvukov_rules_ros2//ros2:cc_defs.bzl", "ros2_cpp_binary")
 load(
     "@com_github_mvukov_rules_ros2//ros2:interfaces.bzl",
@@ -34,5 +36,27 @@ ros2_cpp_binary(
     deps = [
         "//romalcpp/examples:talker_node",
         "//romalcpp/ros2_impl",
+    ],
+)
+
+ros2_topic(
+    name = "topic",
+    deps = [
+        ":romalcpp_examples_ros2_msgs",
+        "@ros2_common_interfaces//:py_nav_msgs",
+        "@ros2_common_interfaces//:py_sensor_msgs",
+        "@ros2_common_interfaces//:py_std_msgs",
+    ],
+)
+
+ros2_bag(
+    name = "bag",
+    idl_deps = [
+        ":romalcpp_examples_ros2_msgs",
+        "@ros2_common_interfaces//:nav_msgs",
+        "@ros2_common_interfaces//:sensor_msgs",
+        "@ros2_common_interfaces//:std_msgs",
+        "@ros2_rcl_interfaces//:rcl_interfaces",
+        "@ros2_rosbag2//:rosbag2_interfaces",
     ],
 )
